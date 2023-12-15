@@ -1,5 +1,5 @@
-/venv
-./env
+/.venv
+**/selina/.env
 /.vscode
 **/__pycache__
 **/migrations
