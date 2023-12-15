@@ -27,7 +27,8 @@ class UserViewSet(viewsets.ViewSet):
     def register(self, request):
         try:
             serializer = RegisterSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             user = serializer.save()
             token = get_tokens_for_user(user)
             return Response({'token': token, 'msg': 'Registration Successful'}, status=status.HTTP_201_CREATED)
@@ -46,7 +47,8 @@ class UserViewSet(viewsets.ViewSet):
     def login(self, request):
         try:
             serializer = LoginSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             email = serializer.validated_data.get('email')
             password = serializer.validated_data.get('password')
             user = authenticate(email=email, password=password)
@@ -62,7 +64,8 @@ class UserViewSet(viewsets.ViewSet):
     def change_password(self, request):
         try:
             serializer = ChangePasswordSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             serializer.update(request.user, serializer.validated_data)
             return Response({'msg':'Password Changed Successfully'}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -72,7 +75,8 @@ class UserViewSet(viewsets.ViewSet):
     def send__reset_password_email(self, request):
         try:
             serializer = PasswordResetEmailSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             return Response({'msg':'Password Reset link send. Please check your Email'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'message':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -83,7 +87,8 @@ class UserViewSet(viewsets.ViewSet):
             uid64 = kwargs.get('uid64')
             token = kwargs.get('token')
             serializer = PasswordResetSerializer(data=request.data, context={'uid64':uid64, 'token':token})
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             serializer.update(serializer.user, serializer.validated_data)
             return Response({'msg':'Password Reset Successfully'}, status=status.HTTP_200_OK)
         except Exception as e:

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from selinaapp.models import User
+from selinaapp.models.user import User
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

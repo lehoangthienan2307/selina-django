@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from selinaapp.models import User
+from selinaapp.models.user import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type':'password'}, write_only=True)
@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         password = attrs.get('password')
         password2 = attrs.get('password2')
         if password != password2:
-            raise serializers.ValidationError("Password not match")     
+            raise serializers.ValidationError({"password":"Password not match"})     
         return attrs
     
     def create(self, validated_data):
