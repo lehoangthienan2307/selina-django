@@ -141,7 +141,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     # "ROTATE_REFRESH_TOKENS": False,
     # "BLACKLIST_AFTER_ROTATION": False,
@@ -189,7 +189,4 @@ EMAIL_HOST_USER = config('EMAIL_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
 EMAIL_USE_TLS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3080",
-    "http://127.0.0.1:3000",
-]
+CORS_ORIGIN_ALLOW_ALL=True

@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         # Don't pass the 'fields' arg up to the superclass
         fields = kwargs.pop('fields', None)
-
+        excludes = kwargs.pop('excludes', None)
         # Instantiate the superclass normally
         super().__init__(*args, **kwargs)
 
@@ -19,4 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             allowed = set(fields)
             existing = set(self.fields)
             for field_name in existing - allowed:
+                self.fields.pop(field_name)
+        if excludes is not None:
+            for field_name in excludes:
                 self.fields.pop(field_name)

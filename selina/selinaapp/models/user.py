@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, fullname, phone, gender, password=None, password2=None):
+    def create_user(self, email, fullname, phone, gender, type, password=None, password2=None):
 
         if not email:
             raise ValueError("User must have an email address")
@@ -13,6 +13,7 @@ class UserManager(BaseUserManager):
             fullname=fullname,
             phone=phone,
             gender=gender,
+            type=type
         )
 
         user.set_password(password)
@@ -60,7 +61,7 @@ class User(TimeStampModel, AbstractUser):
 
    # id = models.AutoField(primary_key=True)
     fullname = models.CharField(max_length=255, blank=False, null=False)
-    phone = models.CharField(max_length=20, null=True, default=None)
+    phone = models.CharField(max_length=20, null=True, default=None, blank=True)
     email = models.EmailField(max_length=255, unique=True)
    # password = models.BinaryField(blank=False, null=False)
     device_token = models.CharField(max_length=1000, null=True, default=None)
@@ -69,6 +70,9 @@ class User(TimeStampModel, AbstractUser):
     status = models.CharField(max_length=255, null=True, choices=Status.choices, default=Status.PENDING)
     gender = models.SmallIntegerField(choices=Gender.choices, default=Gender.OTHER)
     address = models.CharField(max_length=255, null=True, default=None)
+
+    #TO DO: change to redis
+    otp = models.CharField(max_length=8, null=True, default=None)
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['fullname']
