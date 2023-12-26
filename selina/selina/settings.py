@@ -15,6 +15,7 @@ from decouple import config
 import pytz
 from datetime import timedelta
 import os
+import pyrebase
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -79,9 +80,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'selina.wsgi.application'
 
 REST_FRAMEWORK = {
+    
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2,
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
+    
 }
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -190,3 +196,17 @@ EMAIL_HOST_PASSWORD = config('EMAIL_PASS')
 EMAIL_USE_TLS = True
 
 CORS_ORIGIN_ALLOW_ALL=True
+
+# FIREBASE_CONFIG = {
+#     "apiKey": config('API_KEY'),
+#       "authDomain": config('AUTH_DOMAIN'),
+#       "projectId": config('PROJECT_ID'),
+#       "storageBucket": config('STORAGE_BUCKET'),
+#       "messagingSenderId": config('MESSAGING_SENDER_ID'),
+#       "appId": config('APP_ID'),
+#       "measurementId": config('MEASUREMENT_ID'),
+#       "databaseURL": ""
+# }
+
+# firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
+# storage = firebase.storage()

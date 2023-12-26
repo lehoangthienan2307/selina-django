@@ -8,3 +8,7 @@ django_redis
 drf-yasg
 bcrypt
 celery
+pyrebase4
+djangorestframework-simplejwt
+django-cors-headers
+Pillow

@@ -8,8 +8,9 @@ class Book(TimeStampModel):
         db_table = 'book'
         app_label = "selinaapp"
     
-    id = models.AutoField(primary_key=True)
+    book_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=False, null=False)
+    author = models.CharField(max_length=255, blank=True, null=True, default=None)
     seller_id = models.ForeignKey(User, on_delete=models.CASCADE, null=False, related_name="seller")
     desc = models.TextField(max_length=1000, null=False, blank=True, default="")
     price = models.IntegerField()

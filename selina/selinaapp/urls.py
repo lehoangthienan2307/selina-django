@@ -1,12 +1,12 @@
 
 from django.urls import path, include
 #from selinaapp.views.authentication_view import *
-from selinaapp.views import user
+from selinaapp.views import user, book
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('user', user.UserViewSet, basename='user')
-
+router.register('book', book.BookViewSet, basename='book')
 urlpatterns = [
    path('api/', include(router.urls))
 ]

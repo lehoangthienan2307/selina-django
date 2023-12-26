@@ -6,6 +6,7 @@ from selinaapp.serializers.user.login_serializer import LoginSerializer
 from selinaapp.serializers.user.password_reset_email_serializer import PasswordResetEmailSerializer
 from selinaapp.serializers.user.register_serializer import RegisterSerializer
 from selinaapp.serializers.user.user_serializer import UserSerializer
+from selinaapp.serializers.user.edit_profile_serializer import EditProfileSerializer
 from selinaapp.serializers.user.password_reset_serializer import PasswordResetSerializer
 from selinaapp.serializers.user.register_verification_serializer import RegisterVerificationSerializer
 from django.contrib.auth import authenticate
@@ -63,7 +64,7 @@ class UserViewSet(viewsets.ViewSet):
                 if user.status == 'banned':
                     return Response({'data':'account_banned','message':'Tài khoản bị khóa','status_code': 4}, status=status.HTTP_400_BAD_REQUEST)
                 
-                user_data = UserSerializer(user, fields=('id', 'fullname', 'phone', 'email', 'device_token', 'avatar_url', 'type', 'status', 'gender', 'address'))
+                user_data = UserSerializer(user, fields=('id', 'fullname', 'phone', 'email', 'device_token', 'avatar_url', 'user_type', 'status', 'gender', 'address'))
                 token['user_data'] = user_data.data
                 
                 return Response({'data':token,'message':'Đăng nhập thành công','status_code': 1}, status=status.HTTP_200_OK)
@@ -134,12 +135,15 @@ class UserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], url_path='modify-personal-info')
     def modify_personal_info(self, request):
         try:
-            serializer = UserSerializer(instance = request.user, data=request.data, partial=True, fields=('email', 'fullname', 'phone', 'address', 'gender', 'avatar_url'))
+            serializer = EditProfileSerializer(instance = request.user, data=request.data, partial=True)
+            
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_200_OK)
+                print(serializer.errors)
+                return Response({'data':serializer.errors, 'message':'That bai', 'status_code': 1}, status=status.HTTP_200_OK)
             serializer.save()
             return Response({'data':serializer.data, 'message':'Thành công', 'status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
-            pass
+            print(str(e))
+            return Response({'data':str(e), 'message':'Lỗi', 'status_code': 4}, status=status.HTTP_200_OK)
         
     

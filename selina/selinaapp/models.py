@@ -28,7 +28,7 @@ class UserManager(BaseUserManager):
             gender=gender,
             password = password
         )
-        user.type = 'admin'
+        user.user_type = 'admin'
         user.save(using=self._db)
         return user
 

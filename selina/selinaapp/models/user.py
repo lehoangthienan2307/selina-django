@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
             fullname=fullname,
             phone=phone,
             gender=gender,
-            type=type
+            user_type=type
         )
 
         user.set_password(password)
@@ -29,7 +29,7 @@ class UserManager(BaseUserManager):
             gender=gender,
             password = password
         )
-        user.type = 'admin'
+        user.user_type = 'admin'
         user.save(using=self._db)
         return user
 
@@ -65,8 +65,8 @@ class User(TimeStampModel, AbstractUser):
     email = models.EmailField(max_length=255, unique=True)
    # password = models.BinaryField(blank=False, null=False)
     device_token = models.CharField(max_length=1000, null=True, default=None)
-    avatar_url = models.CharField(max_length=255, null=True, default=None)
-    type = models.CharField(max_length=255, null=True, choices=Type.choices, default=Type.NORMAL_USER)
+    avatar_url = models.CharField(max_length=1000, null=False, blank=True, default='')
+    user_type = models.CharField(max_length=255, null=True, choices=Type.choices, default=Type.NORMAL_USER)
     status = models.CharField(max_length=255, null=True, choices=Status.choices, default=Status.PENDING)
     gender = models.SmallIntegerField(choices=Gender.choices, default=Gender.OTHER)
     address = models.CharField(max_length=255, null=True, default=None)
