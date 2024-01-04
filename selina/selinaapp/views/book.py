@@ -6,20 +6,25 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from rest_framework import filters
 class BookViewSet(GenericViewSet):
     serializer_class = BookSerializer
     queryset = Book.objects.all()
     pagination_class = BookPagination
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'author']
     
     def list(self, request):
         try:
-            serializer = self.get_serializer(self.get_queryset(), many=True, excludes=('created_at', 'updated_at', 'deleted_at'))
+            queryset = self.filter_queryset(self.get_queryset())
+            serializer = self.get_serializer(queryset, many=True, excludes=('created_at', 'updated_at', 'deleted_at'))
             data = self.get_paginated_response(self.paginate_queryset(serializer.data)).data
             return Response({'data':data,'message':'Thành công','status_code': 1, 'user_role':request.user.user_type}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'msg':str(e)}, status=status.HTTP_200_OK)
-        
+    
+
     def retrieve(self, request, pk):
         try:
             item = self.get_object()

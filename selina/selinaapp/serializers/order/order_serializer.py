@@ -23,6 +23,8 @@ class OrderSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         buyer = self.context['request'].user
         cart_group = attrs.get('cart_group')
+        if cart_group is None:
+            cart_group = self.instance.cart_group
         if cart_group.buyer != buyer:
             raise serializers.ValidationError({"Cart group không hợp lệ"})
         return super().validate(attrs)
