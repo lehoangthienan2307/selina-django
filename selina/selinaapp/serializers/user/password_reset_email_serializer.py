@@ -21,7 +21,7 @@ class PasswordResetEmailSerializer(serializers.Serializer):
             
             return attrs
         except(User.DoesNotExist):
-            raise serializers.ValidationError('Email not exist')
+            raise serializers.ValidationError({"email":"Email không tồn tại"})
     
     def update(self, instance, validated_data):
         password = Util.generate_password()

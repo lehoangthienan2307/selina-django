@@ -12,7 +12,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     # type = serializers.ChoiceField(choices=USER_TYPE)
     class Meta:
         model = User
-        fields = ['email', 'fullname', 'password', 'password2', 'phone', 'gender', 'type']
+        fields = ['email', 'fullname', 'password', 'password2', 'phone', 'gender', 'user_type']
         extra_kwargs={
             'password':{'write_only':True}
         }

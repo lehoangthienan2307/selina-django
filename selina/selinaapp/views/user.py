@@ -31,12 +31,12 @@ class UserViewSet(viewsets.ViewSet):
         try:
             serializer = RegisterSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'Email đã tồn tại', 'status_code': 4}, status=status.HTTP_200_OK)
             user = serializer.save()
             token = get_tokens_for_user(user)
-            return Response({'token': token, 'message': 'Registration Successful', 'status_code': 1}, status=status.HTTP_201_CREATED)
+            return Response({'token': token, 'message': 'Đăng kí thành công', 'status_code': 1}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response({'msg':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'msg':str(e)}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def profile(self, request):
@@ -44,14 +44,14 @@ class UserViewSet(viewsets.ViewSet):
             serializer = UserSerializer(request.user, fields=('email', 'fullname', 'phone', 'address', 'gender', 'avatar_url'))
             return Response({'data':serializer.data, 'status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'message':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message':str(e)}, status=status.HTTP_200_OK)
         
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
         try:
             serializer = LoginSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_200_OK)
             email = serializer.validated_data.get('email')
             password = serializer.validated_data.get('password')
             user = authenticate(email=email, password=password)
@@ -62,38 +62,38 @@ class UserViewSet(viewsets.ViewSet):
                     return Response({'data':'unverified_account','message':'Tài khoản chưa được kích hoạt','status_code': 4}, status=status.HTTP_200_OK)
                 
                 if user.status == 'banned':
-                    return Response({'data':'account_banned','message':'Tài khoản bị khóa','status_code': 4}, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({'data':'account_banned','message':'Tài khoản bị khóa','status_code': 4}, status=status.HTTP_200_OK)
                 
                 user_data = UserSerializer(user, fields=('id', 'fullname', 'phone', 'email', 'device_token', 'avatar_url', 'user_type', 'status', 'gender', 'address'))
                 token['user_data'] = user_data.data
                 
                 return Response({'data':token,'message':'Đăng nhập thành công','status_code': 1}, status=status.HTTP_200_OK)
             else:
-                return Response({'data':'email_no_exists','message':'Tài khoản hoặc mật khẩu không hợp lệ','status_code': 4}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'data':'email_no_exists','message':'Tài khoản hoặc mật khẩu không hợp lệ','status_code': 4}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'message':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message':str(e)}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], url_path='change-password')
     def change_password(self, request):
         try:
             serializer = ChangePasswordSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_200_OK)
             serializer.update(request.user, serializer.validated_data)
             return Response({'data':serializer.data, 'message':'Thành công', 'status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': str(e)}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny], url_path='send-reset-password-email')
     def send_reset_password_email(self, request):
         try:
             serializer = PasswordResetEmailSerializer(data=request.data)
             if not serializer.is_valid():
-                return Response({'data':'email_does_not_match','message':serializer.errors,'status_code': 4}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'data':'email_does_not_match','message':serializer.errors["email"][0],'status_code': 4}, status=status.HTTP_200_OK)
             serializer.update(serializer.user, serializer.validated_data)
             return Response({'data':'password_sent','message':'Đã gửi mật khẩu','status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'data':'system_error','message':str(e),'status_code': 5}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'data':'system_error','message':str(e),'status_code': 5}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny], url_path='reset-password/(?P<uid64>\w+)/(?P<token>[\w-]+)')
     def reset_password(self, request, **kwargs):
@@ -102,11 +102,11 @@ class UserViewSet(viewsets.ViewSet):
             token = kwargs.get('token')
             serializer = PasswordResetSerializer(data=request.data, context={'uid64':uid64, 'token':token})
             if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.errors, status=status.HTTP_200_OK)
             serializer.update(serializer.user, serializer.validated_data)
             return Response({'msg':'Password Reset Successfully'}, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({'message':e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message':e}, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'], permission_classes=[AllowAny], url_path='approve-account')
     def approve_account(self, request):
@@ -130,16 +130,16 @@ class UserViewSet(viewsets.ViewSet):
             return Response({'message': 'Đăng xuất thành công', 'status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
             print(str(e))
-            return Response({'message':str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message':str(e)}, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], url_path='modify-personal-info')
+    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated], url_path='modify-personal-info')
     def modify_personal_info(self, request):
         try:
             serializer = EditProfileSerializer(instance = request.user, data=request.data, partial=True)
             
             if not serializer.is_valid():
                 print(serializer.errors)
-                return Response({'data':serializer.errors, 'message':'That bai', 'status_code': 1}, status=status.HTTP_200_OK)
+                return Response({'data':serializer.errors, 'message':'That bai', 'status_code': 4}, status=status.HTTP_200_OK)
             serializer.save()
             return Response({'data':serializer.data, 'message':'Thành công', 'status_code': 1}, status=status.HTTP_200_OK)
         except Exception as e:
